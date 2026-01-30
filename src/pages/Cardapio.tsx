@@ -1,10 +1,26 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, Filter, Plus, Minus, ShoppingCart, X, Check } from "lucide-react";
+import { Link } from "react-router-dom";
+import {
+  Search,
+  Filter,
+  Plus,
+  Minus,
+  ShoppingCart,
+  X,
+  Check,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/contexts/CartContext";
-import { products, categories, sortOptions, filterAndSortProducts, type SortOption, type Product } from "@/lib/products";
+import {
+  products,
+  categories,
+  sortOptions,
+  filterAndSortProducts,
+  type SortOption,
+  type Product,
+} from "@/lib/products";
 import { formatCurrency } from "@/lib/whatsapp";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -43,11 +59,15 @@ export default function Cardapio() {
     return filterAndSortProducts(products, category, search, sort);
   }, [category, search, sort]);
 
-  const handleAddToCart = (product: Product, qty: number = 1, obs: string = "") => {
+  const handleAddToCart = (
+    product: Product,
+    qty: number = 1,
+    obs: string = "",
+  ) => {
     if (product.price === 0) {
       window.open(
         `https://wa.me/5515997755982?text=${encodeURIComponent(`Olá! Gostaria de saber mais sobre: ${product.name}`)}`,
-        "_blank"
+        "_blank",
       );
       return;
     }
@@ -66,7 +86,10 @@ export default function Cardapio() {
       title: "Adicionado ao carrinho! 🛒",
       description: `${qty}x ${product.name}`,
       action: (
-        <a href="/carrinho" className="text-primary font-medium hover:underline">
+        <a
+          href="/carrinho"
+          className="text-primary font-medium hover:underline"
+        >
           Ver carrinho
         </a>
       ),
@@ -93,7 +116,7 @@ export default function Cardapio() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="pt-24 pb-16">
         <div className="container-custom">
           {/* Page Header */}
@@ -130,7 +153,10 @@ export default function Cardapio() {
             </div>
 
             {/* Sort */}
-            <Select value={sort} onValueChange={(v) => setSort(v as SortOption)}>
+            <Select
+              value={sort}
+              onValueChange={(v) => setSort(v as SortOption)}
+            >
               <SelectTrigger className="w-full lg:w-48 h-12 rounded-xl">
                 <Filter className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="Ordenar por" />
@@ -170,7 +196,10 @@ export default function Cardapio() {
 
           {/* Results count */}
           <p className="text-sm text-muted-foreground mb-6">
-            {filteredProducts.length} {filteredProducts.length === 1 ? "produto encontrado" : "produtos encontrados"}
+            {filteredProducts.length}{" "}
+            {filteredProducts.length === 1
+              ? "produto encontrado"
+              : "produtos encontrados"}
           </p>
 
           {/* Products Grid */}
@@ -183,7 +212,7 @@ export default function Cardapio() {
                 transition={{ delay: 0.05 * index }}
                 className="group"
               >
-                <div 
+                <div
                   className="relative bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-premium transition-all duration-500 hover:-translate-y-2 cursor-pointer"
                   onClick={() => handleProductClick(product)}
                 >
@@ -194,19 +223,21 @@ export default function Cardapio() {
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    
+
                     {/* Tag */}
                     {product.tag && (
                       <div className="absolute top-3 left-3">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          product.tag === "Mais Vendido" 
-                            ? "bg-gradient-to-r from-primary to-rose-gold text-white"
-                            : product.tag === "Novo"
-                            ? "bg-gradient-to-r from-lilac to-primary text-white"
-                            : product.tag === "Promo"
-                            ? "bg-gradient-to-r from-green-400 to-green-600 text-white"
-                            : "bg-gradient-to-r from-rose-gold to-gold text-white"
-                        }`}>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            product.tag === "Mais Vendido"
+                              ? "bg-gradient-to-r from-primary to-rose-gold text-white"
+                              : product.tag === "Novo"
+                                ? "bg-gradient-to-r from-lilac to-primary text-white"
+                                : product.tag === "Promo"
+                                  ? "bg-gradient-to-r from-green-400 to-green-600 text-white"
+                                  : "bg-gradient-to-r from-rose-gold to-gold text-white"
+                          }`}
+                        >
                           {product.tag}
                         </span>
                       </div>
@@ -229,7 +260,7 @@ export default function Cardapio() {
                   {/* Content */}
                   <div className="p-4">
                     <span className="text-xs text-muted-foreground uppercase tracking-wide">
-                      {categories.find(c => c.id === product.category)?.name}
+                      {categories.find((c) => c.id === product.category)?.name}
                     </span>
                     <h3 className="text-lg font-semibold mt-1 mb-2 group-hover:text-primary transition-colors line-clamp-1">
                       {product.name}
@@ -283,14 +314,19 @@ export default function Cardapio() {
       </main>
 
       {/* Product Detail Modal */}
-      <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
+      <Dialog
+        open={!!selectedProduct}
+        onOpenChange={() => setSelectedProduct(null)}
+      >
         <DialogContent className="max-w-lg">
           {selectedProduct && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-2xl">{selectedProduct.name}</DialogTitle>
+                <DialogTitle className="text-2xl">
+                  {selectedProduct.name}
+                </DialogTitle>
               </DialogHeader>
-              
+
               <div className="space-y-4">
                 {/* Image */}
                 <div className="aspect-video rounded-xl overflow-hidden">
@@ -303,7 +339,8 @@ export default function Cardapio() {
 
                 {/* Description */}
                 <p className="text-muted-foreground">
-                  {selectedProduct.fullDescription || selectedProduct.description}
+                  {selectedProduct.fullDescription ||
+                    selectedProduct.description}
                 </p>
 
                 {/* Ingredients */}
@@ -324,16 +361,17 @@ export default function Cardapio() {
                 )}
 
                 {/* Allergens */}
-                {selectedProduct.allergens && selectedProduct.allergens.length > 0 && (
-                  <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-xl">
-                    ⚠️ Contém: {selectedProduct.allergens.join(", ")}
-                  </div>
-                )}
+                {selectedProduct.allergens &&
+                  selectedProduct.allergens.length > 0 && (
+                    <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-xl">
+                      ⚠️ Contém: {selectedProduct.allergens.join(", ")}
+                    </div>
+                  )}
 
                 {/* Price */}
                 <div className="text-2xl font-bold gradient-text">
-                  {selectedProduct.price > 0 
-                    ? formatCurrency(selectedProduct.price) 
+                  {selectedProduct.price > 0
+                    ? formatCurrency(selectedProduct.price)
                     : "Sob consulta"}
                   {selectedProduct.priceNote && selectedProduct.price > 0 && (
                     <span className="text-sm text-muted-foreground font-normal ml-1">
@@ -390,7 +428,8 @@ export default function Cardapio() {
                       onClick={handleModalAdd}
                     >
                       <ShoppingCart className="w-5 h-5 mr-2" />
-                      Adicionar {formatCurrency(selectedProduct.price * quantity)}
+                      Adicionar{" "}
+                      {formatCurrency(selectedProduct.price * quantity)}
                     </Button>
                   </>
                 )}
@@ -403,7 +442,7 @@ export default function Cardapio() {
                     onClick={() => {
                       window.open(
                         `https://wa.me/5515997755982?text=${encodeURIComponent(`Olá! Gostaria de saber mais sobre: ${selectedProduct.name}`)}`,
-                        "_blank"
+                        "_blank",
                       );
                     }}
                   >
@@ -418,18 +457,25 @@ export default function Cardapio() {
 
       {/* Floating Cart Button */}
       {totalItems > 0 && (
-        <motion.a
-          href="/carrinho"
+        <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           className="fixed bottom-24 right-6 z-40"
-          aria-label={`Ver carrinho com ${totalItems} itens`}
         >
-          <Button variant="hero" size="lg" className="rounded-full shadow-premium">
-            <ShoppingCart className="w-5 h-5" />
-            <span className="ml-2">{totalItems}</span>
-          </Button>
-        </motion.a>
+          <Link
+            to="/carrinho"
+            aria-label={`Ver carrinho com ${totalItems} itens`}
+          >
+            <Button
+              variant="hero"
+              size="lg"
+              className="rounded-full shadow-premium"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              <span className="ml-2">{totalItems}</span>
+            </Button>
+          </Link>
+        </motion.div>
       )}
 
       <Footer />
