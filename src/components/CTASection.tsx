@@ -82,7 +82,7 @@ export default function CTASection() {
               <Button
                 variant="whatsapp"
                 size="xl"
-                className="shadow-2xl hover:shadow-[0_20px_60px_-15px_rgba(37,211,102,0.5)]"
+                className="w-full sm:w-auto shadow-2xl hover:shadow-[0_20px_60px_-15px_rgba(37,211,102,0.5)]"
                 asChild
               >
                 <a
@@ -90,8 +90,10 @@ export default function CTASection() {
                   rel="noopener noreferrer"
                   href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`}
                 >
-                  <MessageCircle className="w-6 h-6" />
-                  Fazer Pedido pelo WhatsApp
+                  <MessageCircle className="w-6 h-6 shrink-0" />
+                  <span className="ml-2 break-words">
+                    Fazer Pedido pelo WhatsApp
+                  </span>
                 </a>
               </Button>
             </motion.div>
