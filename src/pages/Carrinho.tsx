@@ -158,21 +158,21 @@ export default function Carrinho() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen flex flex-col bg-background">
         <Header />
         <main className="pt-24 pb-16">
           <div className="container-custom">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center py-20"
+              className="flex flex-col items-center justify-center text-center min-h-[60vh]"
             >
               <ShoppingBag className="w-24 h-24 mx-auto text-muted-foreground/30 mb-6" />
               <h1 className="text-3xl font-bold mb-4">
                 Seu carrinho está vazio
               </h1>
               <p className="text-muted-foreground mb-8">
-                Que tal adicionar alguns doces deliciosos?
+                Que tal adicionar alguns doces deliciosos? 🍬
               </p>
               <Link to="/cardapio">
                 <Button
@@ -192,10 +192,10 @@ export default function Carrinho() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      <main className="pt-24 pb-16">
+      <main className="flex-1 pt-24 pb-16">
         <div className="container-custom">
           {/* Header */}
           <motion.div
