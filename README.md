@@ -6,7 +6,9 @@ O projeto foi pensado para transmitir profissionalismo, carinho e identidade de 
 
 ---
 
- <img src="/public/Home.png" width="300" height="200" />
+<div align="center">
+  <img src="/public/Home.png" width="800" />
+</div>
  
 ---
 ## ✨ Funcionalidades
@@ -59,7 +61,7 @@ npm run dev
 ## A aplicação estará disponível em:
 
 ```bash
-http://localhost:5173
+https://doce-encanto-atanasio-dev.vercel.app/
 ```
 
 ---
@@ -87,4 +89,10 @@ Criar uma experiência simples, bonita e funcional para pequenas marcas, facilit
 ## 👨‍💻 Desenvolvido por
 
 Atanasio
-[LinkedIn](https://www.linkedin.com/in/niltonatanasio/)
+<a
+href="https://www.linkedin.com/in/niltonatanasio/"
+target="\_blank"
+rel="noopener noreferrer"
+
+> LinkedIn
+> </a>
