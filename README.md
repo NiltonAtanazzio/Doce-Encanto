@@ -42,8 +42,6 @@ O projeto foi pensado para transmitir profissionalismo, carinho e identidade de 
 
 O projeto está publicado na Vercel.
 
-**Ambiente de produção:**
-
 ---
 
 ## 📦 Como rodar o projeto localmente
