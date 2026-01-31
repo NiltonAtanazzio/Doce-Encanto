@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
   Search,
@@ -40,6 +40,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { ChevronDown } from "lucide-react";
 
 export default function Cardapio() {
   const [search, setSearch] = useState("");
@@ -55,6 +56,12 @@ export default function Cardapio() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  useEffect(() => {
+    if (selectedProduct) {
+      setQuantity(1);
+      setObservation("");
+    }
+  }, [selectedProduct]);
   const filteredProducts = useMemo(() => {
     return filterAndSortProducts(products, category, search, sort);
   }, [category, search, sort]);
@@ -113,6 +120,49 @@ export default function Cardapio() {
     }
   };
 
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [showScrollHint, setShowScrollHint] = useState(false);
+  const [showScrollToast, setShowScrollToast] = useState(false);
+  const [hasUserScrolled, setHasUserScrolled] = useState(false);
+  const toastTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!selectedProduct) return;
+
+    setHasUserScrolled(false);
+
+    // limpa timer anterior
+    if (toastTimerRef.current) {
+      window.clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = null;
+    }
+
+    requestAnimationFrame(() => {
+      const el = scrollRef.current;
+      if (!el) return;
+
+      const extraScroll = el.scrollHeight - el.clientHeight;
+      const canScroll = extraScroll > 120;
+      setShowScrollHint(canScroll);
+
+      if (canScroll) {
+        setShowScrollToast(true);
+
+        toastTimerRef.current = window.setTimeout(() => {
+          setShowScrollToast(false);
+          toastTimerRef.current = null;
+        }, 6000); // 6s (bem melhor)
+      }
+    });
+
+    // cleanup quando fechar modal ou trocar produto
+    return () => {
+      if (toastTimerRef.current) {
+        window.clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = null;
+      }
+    };
+  }, [selectedProduct]);
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -318,32 +368,130 @@ export default function Cardapio() {
         open={!!selectedProduct}
         onOpenChange={() => setSelectedProduct(null)}
       >
-        <DialogContent className="max-w-lg">
+        <DialogContent
+          className="
+      rounded-3xl w-[calc(100vw-1.5rem)] sm:max-w-lg max-h-[85vh] backdrop-blur-xl bg-white/90 border-rose-200/40 p-0 overflow-hidden flex flex-col shadow-[0_25px_80px_-20px_rgba(0,0,0,0.35)] border-primary/20 bg-white/95
+    "
+        >
           {selectedProduct && (
             <>
-              <DialogHeader>
-                <DialogTitle className="text-2xl">
-                  {selectedProduct.name}
-                </DialogTitle>
-              </DialogHeader>
+              {/* Header fixo */}
+              <div className="p-5 sm:p-6 border-b">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl">
+                    {selectedProduct.name}
+                  </DialogTitle>
+                </DialogHeader>
+              </div>
 
-              <div className="space-y-4">
-                {/* Image */}
+              {/* Conteúdo rolável */}
+              <div
+                className="relative flex-1 p-5 sm:p-6 overflow-y-auto space-y-4"
+                onScroll={(e) => {
+                  const el = e.currentTarget;
+                  const atBottom =
+                    el.scrollTop + el.clientHeight >= el.scrollHeight - 6;
+                  setShowScrollHint(!atBottom);
+                  if (!hasUserScrolled && el.scrollTop > 40) {
+                    setHasUserScrolled(true);
+                    setShowScrollToast(false);
+                  }
+                }}
+                ref={scrollRef}
+              >
                 <div className="aspect-video rounded-xl overflow-hidden">
                   <img
                     src={selectedProduct.image}
                     alt={selectedProduct.name}
                     className="w-full h-full object-cover"
                   />
+
+                  {showScrollHint && (
+                    <div className="pointer-events-none sticky bottom-0 left-0 right-0">
+                      <div className="h-10 bg-gradient-to-t from-background to-transparent" />
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1, y: [0, 6, 0] }}
+                        transition={{ duration: 1.2, repeat: Infinity }}
+                        className="
+  absolute bottom-2 left-1/2 -translate-x-1/2
+  bg-gradient-to-r from-primary to-rose-gold
+  text-transparent bg-clip-text
+  drop-shadow-[0_0_12px_rgba(236,72,153,0.6)]
+"
+                      >
+                        <ChevronDown
+                          className=" w-5 h-5
+    text-white
+    drop-shadow-[0_0_16px_rgba(236,72,153,0.8)]"
+                        />
+                      </motion.div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Description */}
+                <AnimatePresence>
+                  {showScrollToast && (
+                    <motion.div
+                      key="scroll-hint"
+                      initial={{
+                        opacity: 0,
+                        y: 12,
+                        scale: 0.95,
+                        filter: "blur(6px)",
+                      }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        filter: "blur(0px)",
+                      }}
+                      exit={{
+                        opacity: 0,
+                        y: 10,
+                        scale: 0.96,
+                        filter: "blur(6px)",
+                      }}
+                      transition={{
+                        duration: 0.45,
+                        ease: [0.22, 1, 0.36, 1], // easeOutExpo
+                      }}
+                      className="
+        absolute left-1/2 -translate-x-1/2 bottom-3 z-20
+        px-3 py-2 rounded-full
+        bg-white/90 backdrop-blur
+        border border-primary/20
+        shadow-lg
+        text-xs sm:text-sm
+        text-foreground
+        max-w-[90%] text-center
+      "
+                    >
+                      <motion.span
+                        animate={{ y: [0, -2, 0] }}
+                        transition={{
+                          duration: 1.6,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                        className="inline-block"
+                      >
+                        <span className="font-medium">
+                          Role para ver detalhes
+                        </span>{" "}
+                        <span className="text-muted-foreground">
+                          e escolher a quantidade ↓
+                        </span>
+                      </motion.span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <p className="text-muted-foreground">
                   {selectedProduct.fullDescription ||
                     selectedProduct.description}
                 </p>
 
-                {/* Ingredients */}
                 {selectedProduct.ingredients && (
                   <div>
                     <h4 className="font-semibold mb-2">Ingredientes:</h4>
@@ -351,7 +499,7 @@ export default function Cardapio() {
                       {selectedProduct.ingredients.map((ing) => (
                         <span
                           key={ing}
-                          className="px-3 py-1 bg-blush rounded-full text-sm"
+                          className="px-3 py-1 bg-blush rounded-full text-sm break-words max-w-full"
                         >
                           {ing}
                         </span>
@@ -360,15 +508,12 @@ export default function Cardapio() {
                   </div>
                 )}
 
-                {/* Allergens */}
-                {selectedProduct.allergens &&
-                  selectedProduct.allergens.length > 0 && (
-                    <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-xl">
-                      ⚠️ Contém: {selectedProduct.allergens.join(", ")}
-                    </div>
-                  )}
+                {selectedProduct.allergens?.length > 0 && (
+                  <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-xl">
+                    ⚠️ Contém: {selectedProduct.allergens.join(", ")}
+                  </div>
+                )}
 
-                {/* Price */}
                 <div className="text-2xl font-bold gradient-text">
                   {selectedProduct.price > 0
                     ? formatCurrency(selectedProduct.price)
@@ -382,7 +527,6 @@ export default function Cardapio() {
 
                 {selectedProduct.price > 0 && (
                   <>
-                    {/* Quantity */}
                     <div className="flex items-center gap-4">
                       <span className="font-medium">Quantidade:</span>
                       <div className="flex items-center gap-3">
@@ -390,6 +534,7 @@ export default function Cardapio() {
                           variant="outline"
                           size="icon"
                           onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                          aria-label="Diminuir quantidade"
                         >
                           <Minus className="w-4 h-4" />
                         </Button>
@@ -400,13 +545,13 @@ export default function Cardapio() {
                           variant="outline"
                           size="icon"
                           onClick={() => setQuantity(quantity + 1)}
+                          aria-label="Aumentar quantidade"
                         >
                           <Plus className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
 
-                    {/* Observation */}
                     <div>
                       <label className="block font-medium mb-2">
                         Observação (opcional):
@@ -419,37 +564,24 @@ export default function Cardapio() {
                         rows={2}
                       />
                     </div>
-
-                    {/* Add Button */}
-                    <Button
-                      variant="hero"
-                      size="lg"
-                      className="w-full"
-                      onClick={handleModalAdd}
-                    >
-                      <ShoppingCart className="w-5 h-5 mr-2" />
-                      Adicionar{" "}
-                      {formatCurrency(selectedProduct.price * quantity)}
-                    </Button>
                   </>
                 )}
+              </div>
 
-                {selectedProduct.price === 0 && (
+              {/* Footer fixo */}
+              {selectedProduct.price > 0 && (
+                <div className="p-5 sm:p-6 border-t bg-background">
                   <Button
                     variant="hero"
                     size="lg"
                     className="w-full"
-                    onClick={() => {
-                      window.open(
-                        `https://wa.me/5515997755982?text=${encodeURIComponent(`Olá! Gostaria de saber mais sobre: ${selectedProduct.name}`)}`,
-                        "_blank",
-                      );
-                    }}
+                    onClick={handleModalAdd}
                   >
-                    Solicitar Orçamento
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Adicionar {formatCurrency(selectedProduct.price * quantity)}
                   </Button>
-                )}
-              </div>
+                </div>
+              )}
             </>
           )}
         </DialogContent>
