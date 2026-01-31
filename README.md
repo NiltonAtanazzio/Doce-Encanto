@@ -89,10 +89,4 @@ Criar uma experiência simples, bonita e funcional para pequenas marcas, facilit
 ## 👨‍💻 Desenvolvido por
 
 Atanasio
-<a
-href="https://www.linkedin.com/in/niltonatanasio/"
-target="\_blank"
-rel="noopener noreferrer"
-
-> LinkedIn
-> </a>
+<a href="https://www.linkedin.com/in/niltonatanasio/" target="\_blank" rel="noopener noreferrer"> LinkedIn </a>
